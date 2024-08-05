@@ -1,0 +1,13 @@
+{
+  "include": ["src"],
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+     "declaration": true,
+    "outDir": "dist",
+    "target": "es2015",
+    "module": "commonjs",
+    "baseUrl": "./",
+    "allowJs": true,
+    "moduleResolution": "node"
+  }
+}
