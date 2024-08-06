@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bsd2077/vue-sfc-inspect.git"
+    "url": "git+https://github.com/bsd2077/vue-sfc-inspect.git"
   },
   "author": "Leon @bsd2077",
   "homepage": "https://github.com/bsd2077/vue-sfc-inspect",
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "opener": "^1.5.2",
+    "vue": "^3",
     "serve-static": "^1.15.0"
   },
   "devDependencies": {
