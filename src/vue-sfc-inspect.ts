@@ -11,10 +11,14 @@ import * as http from "node:http";
 const pluginName = 'VueSfcInspectPlugin'
 
 interface option {
-    port?: number | "auto"
+    port?: number | "auto",
+    auto_open_browser?:boolean
+
 }
 
 let server_port: number
+
+
 let is_init_tip: boolean = false
 
 function arr_unique(arr: string[]) {
@@ -23,6 +27,7 @@ function arr_unique(arr: string[]) {
 
 class VueSfcInspect {
     server: any
+    auto_open_browser:boolean
     vue_resource: string[]
     port: number | "auto"
 
@@ -44,9 +49,16 @@ class VueSfcInspect {
 
     }
 
-    constructor(option: option = {port: "auto"}) {
+    constructor(option: option = {port: "auto",auto_open_browser:true}) {
+
+
         this.vue_resource = []
         this.port = option.port || "auto"
+        if(option.auto_open_browser===false){
+            this.auto_open_browser =false
+        }else { this.auto_open_browser = true}
+
+
         this.init_server(this.port)
     }
 
@@ -73,7 +85,10 @@ class VueSfcInspect {
             (compilation) => {
                 if (!is_init_tip) {
                     console.log(`Vue-Sfc-Inspect-Plugin is started at http://127.0.0.1:${(this.server.address() as AddressInfo).port}`)
-                    opener(`http://127.0.0.1:${(this.server.address() as AddressInfo).port}`)
+                    if(this.auto_open_browser===true){
+                        opener(`http://127.0.0.1:${(this.server.address() as AddressInfo).port}`)
+
+                    }
                     is_init_tip = true
                 }
             }
