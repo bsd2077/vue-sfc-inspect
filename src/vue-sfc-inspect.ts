@@ -1,15 +1,18 @@
 import serveStatic = require("serve-static")
+import { version } from 'vue'
 import type {AddressInfo} from 'net'
 import path = require('path');
 import type {Compiler} from 'webpack'
-import {parse} from './pase'
+import {parse} from './parse'
 import fs = require('fs');
 import opener = require('opener');
 import * as http from "node:http";
+import {parse_vue2_7} from "./parse_vue2_7";
 
 
 const pluginName = 'VueSfcInspectPlugin'
 
+type vue_version="2.7"|"2"|"3"
 interface option {
     port?: number | "auto",
     auto_open_browser?:boolean
@@ -30,7 +33,15 @@ class VueSfcInspect {
     auto_open_browser:boolean
     vue_resource: string[]
     port: number | "auto"
+    vue_version:vue_version
 
+    init_vue_version(){
+        let v=version.substring(0,3)
+        if(v==="2.7"){this.vue_version="2.7"}else {
+            this.vue_version=version.substring(0,1)  as vue_version
+        }
+
+    }
     init_server(port: number | "auto") {
         this.server = http.createServer()
         if (this.port === "auto" || this.port === void 0) {
@@ -57,7 +68,7 @@ class VueSfcInspect {
         if(option.auto_open_browser===false){
             this.auto_open_browser =false
         }else { this.auto_open_browser = true}
-
+        this.init_vue_version()
 
         this.init_server(this.port)
     }
@@ -97,22 +108,51 @@ class VueSfcInspect {
 
             let unique = arr_unique(this.vue_resource)
             let Template_array = []
-            unique.forEach((path_sfc) => {
-                let sfc = fs.readFileSync(path_sfc, "utf-8")
-                const {
-                    filename,
-                    Template,
+            let Template
 
-                } = parse(sfc.toString(), {
+
+
+            if( this.vue_version==="3"){
+                unique.forEach((path_sfc) => {
+                let sfc = fs.readFileSync(path_sfc, "utf-8")
+                Template= parse(sfc.toString(), {
                     filename: path_sfc,
                     isProd: true,
                     parse_type: "Template"
-                });
+                }).Template;
                 if (!Template) {
                     return
                 }
                 Template_array.push(Template)
-            });
+            })
+
+
+
+            }
+            if( this.vue_version==="2.7"){
+
+                unique.forEach((path_sfc) => {
+                    let sfc = fs.readFileSync(path_sfc, "utf-8")
+                    Template= parse_vue2_7({
+source:sfc.toString(),
+filename: path_sfc,
+                    })
+                    if (!Template) {
+                        return
+                    }
+                    Template_array.push(Template)
+                })
+
+            }
+            if( this.vue_version==="2"){
+
+
+            }
+
+
+
+
+
             let Static_folder = path.join(__dirname, '..', 'static')
 
             let Static = serveStatic(Static_folder,)

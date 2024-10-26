@@ -20,11 +20,11 @@
     "static"
   ],
   "peerDependencies": {
+    "vue": "^2.7.16",
     "webpack": "^5"
   },
   "dependencies": {
     "opener": "^1.5.2",
-    "vue": "^3",
     "serve-static": "^1.15.0"
   },
   "devDependencies": {
