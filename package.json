@@ -24,6 +24,7 @@
     "webpack": "^5"
   },
   "dependencies": {
+    "@vue/compiler-sfc": "^3.5.12",
     "opener": "^1.5.2",
     "serve-static": "^1.15.0"
   },
