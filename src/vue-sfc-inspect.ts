@@ -2,12 +2,14 @@ import serveStatic = require("serve-static")
 import { version } from 'vue'
 import type {AddressInfo} from 'net'
 import path = require('path');
-import type {Compiler} from 'webpack'
-import {parse} from './parse'
+import  {Compiler} from 'webpack'
+/*import {parse} from './parse'*/
 import fs = require('fs');
 import opener = require('opener');
 import * as http from "node:http";
-import {parse_vue2_7} from "./parse_vue2_7";
+/*import {parse_vue2_7} from "./parse_vue2_7";
+import {parse_vue2} from "./parse_vue2";*/
+
 
 
 const pluginName = 'VueSfcInspectPlugin'
@@ -34,11 +36,20 @@ class VueSfcInspect {
     vue_resource: string[]
     port: number | "auto"
     vue_version:vue_version
-
+    parse:any
     init_vue_version(){
         let v=version.substring(0,3)
-        if(v==="2.7"){this.vue_version="2.7"}else {
+        if(v==="2.7"){this.vue_version="2.7"
+            this.parse=require("./parse_vue2_7")
+
+        }else {
             this.vue_version=version.substring(0,1)  as vue_version
+            if (this.vue_version==="3"){
+                this.parse=require('./parse')
+            }
+            if (this.vue_version==="2"){
+                this.parse=require("./parse_vue2")
+            }
         }
 
     }
@@ -115,7 +126,7 @@ class VueSfcInspect {
             if( this.vue_version==="3"){
                 unique.forEach((path_sfc) => {
                 let sfc = fs.readFileSync(path_sfc, "utf-8")
-                Template= parse(sfc.toString(), {
+                Template= this.parse(sfc.toString(), {
                     filename: path_sfc,
                     isProd: true,
                     parse_type: "Template"
@@ -133,7 +144,7 @@ class VueSfcInspect {
 
                 unique.forEach((path_sfc) => {
                     let sfc = fs.readFileSync(path_sfc, "utf-8")
-                    Template= parse_vue2_7({
+                    Template= this.parse({
 source:sfc.toString(),
 filename: path_sfc,
                     })
@@ -145,6 +156,16 @@ filename: path_sfc,
 
             }
             if( this.vue_version==="2"){
+                unique.forEach((path_sfc) => {
+                    let sfc = fs.readFileSync(path_sfc, "utf-8")
+                    Template= this.parse(sfc.toString(),{
+                        filename: path_sfc,
+                    })
+                    if (!Template) {
+                        return
+                    }
+                    Template_array.push(Template)
+                })
 
 
             }
